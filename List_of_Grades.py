@@ -144,9 +144,21 @@ class MainWindow(QMainWindow):
             "CSV Files (*.csv);;All Files (*)"
         )
         if file_path:
-            # TODO: שמור את נתיב הקובץ ב-self.selected_file
-            # TODO: קרא את קובץ ה-CSV ומלא את self.student_ids, self.original_grades ו-self.corrected_grades
-            # TODO: קרא למתודת self.update_table() כדי לעדכן את הטבלה בתצוגה
+            self.selected_file = file_path          
+            self.student_ids = []
+            self.original_grades = []
+            self.corrected_grades = []
+            with open(self.selected_file, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+                # רצים משורה 1 והלאה כדי לדלג על שורת הכותרות (שורה 0)
+                for line in lines[1:]:
+                    parts = line.strip().split(',')
+                    student_id = parts[0]
+                    grade = int(parts[1])
+                    self.student_ids.append(student_id)
+                    self.original_grades.append(grade)
+                    self.corrected_grades.append(grade)
+            self.update_table()
             pass
 
     def update_table(self):
