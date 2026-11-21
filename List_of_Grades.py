@@ -18,8 +18,6 @@ from PySide6.QtGui import QDesktopServices
 
 
 class AboutWindow(QDialog):
-    """חלון אודות מעוצב עם פרטים אישיים וקישור ל-GitHub"""
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("About")
@@ -62,7 +60,6 @@ class AboutWindow(QDialog):
 
 class MainWindow(QMainWindow):
     """החלון הראשי של האפליקציה"""
-
     def __init__(self):
         super().__init__()
 
@@ -190,19 +187,29 @@ class MainWindow(QMainWindow):
     def apply_bonus(self):
         """מופעלת בלחיצה על ENTER בווידג'ט נקודות הבונוס"""
         bonus_value = self.spin_bonus.value()
-        # TODO: עדכן את רשימת הציונים המתוקנים (self.corrected_grades) לפי ערך הבונוס (bonus_value)
-        # TODO: קרא למתודת self.update_table() כדי לרענן את הנתונים בטבלה
+        for i in range(len(self.original_grades)):
+            new_grade = self.original_grades[i] + bonus_value
+            if new_grade > 100:
+                new_grade = 100
+            self.corrected_grades[i] = new_grade
+
+        self.update_table()
 
     def update_file(self):
-        """שמירת הנתונים המעודכנים לקובץ ופתיחתו בתוכנת ברירת המחדל"""
-        # TODO: כתוב כאן את דריסת קובץ ה-CSV (בנתיב self.selected_file) עם הנתונים המעודכנים מתוך הרשימות
+        if self.selected_file:
+            # שומרים את שורת הכותרות המקורית לפני הדריסה
+            with open(self.selected_file, 'r', encoding='utf-8') as file:
+                header = file.readline()
 
-        # פתיחת הקובץ בתוכנת ברירת המחדל בכל מערכות ההפעלה באמצעות PySide6
+            # דורסים את הקובץ עם הכותרת המקורית והציונים המתוקנים
+            with open(self.selected_file, 'w', encoding='utf-8') as file:
+                file.write(header)
+                for i in range(len(self.student_ids)):
+                    file.write(f"{self.student_ids[i]},{self.corrected_grades[i]}\n")
         if self.selected_file:
             QDesktopServices.openUrl(QUrl.fromLocalFile(self.selected_file))
 
     def show_about(self):
-        """פתיחת חלון About מעוצב"""
         self.about_window = AboutWindow(self)
         self.about_window.show()
 
